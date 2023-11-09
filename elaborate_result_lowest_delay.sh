@@ -1,11 +1,5 @@
 #! usr/bin/bash
 
-total_duration=300
-
-
-start_time=$(date +%s)
-
-
 while true; do
 
     python3 Tesi/data_processing_1m.py
