@@ -78,7 +78,7 @@ telegraf -config telegraf-hA.conf
 
 ## to add the delay
 ```
-bash delay.sh
+bash delay1.sh
 ```
 ## to process data
 ```
