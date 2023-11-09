@@ -22,10 +22,9 @@ sudo service influxdb status
 
 ## setting InfluxDb
 set name, organization, bucket, save token
-http://localhost:8086
+
 
 ## install Grafana
-https://grafana.com/grafana/download
 ```
 sudo apt-get install -y adduser libfontconfig1 musl
 wget https://dl.grafana.com/enterprise/release/grafana-enterprise_10.1.4_amd64.deb
@@ -45,7 +44,7 @@ cd ryu
 sudo python3 ./setup.py install 
 sudo pip3 install --upgrade ryu
 ```
-## to write the telegraf configuration of the host A
+## telegraf configuration of the host A
 in terminal 1 start mininet
 ```
 sudo mn --custom /mininet/custom/topo_6_hosts.py --topo=mytopo
@@ -56,7 +55,9 @@ mininet/util/m hA
 telegraf --sample-config --input-filter ping --output-filter influxdb_v2 > telegraf-hA.conf
 ```
 then modify the file telegraf-hA.conf
+
 in the influx plugin update the urls, token, bucket and organization
+
 in the ping plugin add in urls the hosts 
 
 
@@ -82,5 +83,5 @@ bash delay1.sh
 ```
 ## to process data
 ```
-python3 data_processing.py
+python3 data_processing_RL.py
 ```
