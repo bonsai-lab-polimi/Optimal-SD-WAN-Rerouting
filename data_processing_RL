@@ -1,0 +1,62 @@
+import pandas as pd
+import numpy
+import csv    
+import zmq
+import time
+from influxdb_client import InfluxDBClient
+
+# Setup the influxdb connection
+url="http://10.10.5.101:8086"
+token="qMUeAlYWsvFj9yWmKFy4eh5_yLlXbqgj-8bdauCjg0d25UVbFsqW-cWYklQfJnk47izpidwnVmPL76JvTwAJFA=="
+org="Poli"
+bucket= "Poli"
+
+# Start the server for message queuing
+context = zmq.Context()
+socket = context.socket(zmq.REP)
+socket.bind("tcp://*:5555")
+
+
+# Main
+client = InfluxDBClient(url=url, token=token, org=org)
+
+query ="""from(bucket:"Poli")
+  |> range(start: -20s, stop: now())
+  |> filter(fn: (r) => r["url"] == "10.0.0.4" or r["url"] == "10.0.0.5" or r["url"] == "10.0.0.6" or r["url"] == "10.0.0.7")
+  |> filter(fn: (r) => r["_field"] == "average_response_ms")
+  |> filter(fn: (r) => r["_measurement"] == "ping")
+  |> filter(fn: (r) => r["host"] == "bonsai207")
+  |> aggregateWindow(every: 20s, fn: last, createEmpty: false)
+  |> yield(name: "mean") |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")"""
+
+
+light = "GREEN" 
+while True:
+  result = client.query_api().query_data_frame(org=org, query=query)
+  if len(result) > 0:
+    results=result[0]
+    data= []
+    if "_value" in results.columns:
+      data=results["_value"].astype(float).tolist()
+    elif "average_response_ms" in results.columns:
+      data=results["average_response_ms"].astype(float).tolist()   
+
+    if len(data) > 4:
+          output_csv = 'average_values.csv'
+          with open("deep_rl_env_data/out.csv", mode='w', newline='') as csv_file:
+              csv_writer = csv.writer(csv_file)
+              csv_writer.writerow(data[::2]) 
+    else:
+          with open("deep_rl_env_data/out.csv", mode='w', newline='') as csv_file:
+              csv_writer = csv.writer(csv_file)
+              csv_writer.writerow(data)
+        # Wait until the client is ready to read the csv
+    message = socket.recv()
+    time.sleep(0.01)
+    decoded_string = message.decode("utf-8")
+    # the client is ready, send the GREEN light
+    if decoded_string == 'READY':
+          socket.send_string(light)
+    
+    time.sleep(10)
+
