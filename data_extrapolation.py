@@ -60,31 +60,6 @@ elif data_7<data_4 and data_7<data_5 and data_7<data_6:
 else:
     result=1
 
-with open ("Tesi/times.txt", 'a') as file4:
-    file4.write("new iteration:\n ip 10.0.0.4: ")
-    file4.write(data_ip_4)
-    file4.write("\n ip 10.0.0.5: ")
-    file4.write(data_ip_5)
-    file4.write("\n ip 10.0.0.6: ")
-    file4.write(data_ip_6)
-    file4.write("\n ip 10.0.0.7: ")
-    file4.write(data_ip_7)
-    file4.write("\nChosen path= ")
-    file4.write(str(result))
-    file4.write("\n\n\n")
-
-
 with open("Tesi/result.txt", 'w') as file1:
     file1.write(str(result))
 
-with open("Tesi/host.txt", 'a')  as file2:
-    current_time= datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-    file2.write("Time: ")
-    file2.write(str(current_time))
-    file2.write("\n")
-    if (data_ip_4=="0"):
-        file2.write("File formatted incorrectly\n")
-    elif result==1 or result==2:
-        file2.write("Host 10.0.0.1\n")
-    else:
-        file2.write("Host 10.0.0.2\n")    
